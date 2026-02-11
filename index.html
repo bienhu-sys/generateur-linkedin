@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur LinkedIn — NB NEXT STEP</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c4a470;--gold-light:#e8dcc8;--gold-dim:rgba(196,164,112,0.5);--gold-faint:rgba(196,164,112,0.06);--dark-bg:#0a0c10;--dark-mid:#131820;--text-light:#e8e4de;--text-dim:#8a8578;--border-faint:rgba(255,255,255,0.06);--border-active:rgba(196,164,112,0.5);--red:#e74c3c;--orange:#f39c12;--green:#27ae60}
+body{min-height:100vh;background:linear-gradient(168deg,var(--dark-bg) 0%,var(--dark-mid) 40%,var(--dark-bg) 100%);font-family:'Cormorant Garamond',Georgia,serif;color:var(--text-light);line-height:1.5}
+header{padding:36px 28px 28px;border-bottom:1px solid rgba(196,164,112,0.15);background:linear-gradient(180deg,var(--gold-faint) 0%,transparent 100%)}
+.header-inner{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),#8b7355);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(196,164,112,0.25);flex-shrink:0}
+.header-title{font-size:26px;font-weight:600;letter-spacing:.02em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-sub{font-size:12px;font-family:'DM Sans',sans-serif;color:rgba(196,164,112,0.6);letter-spacing:.15em;text-transform:uppercase}
+main{max-width:880px;margin:0 auto;padding:28px 28px 60px}
+.section-label{display:block;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--gold-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+.selector-row{display:flex;gap:12px;flex-wrap:wrap}
+.selector-btn{flex:1 1 200px;padding:16px 20px;background:rgba(255,255,255,0.02);border:1px solid var(--border-faint);border-radius:12px;cursor:pointer;text-align:left;transition:all .3s ease;font-family:inherit;color:inherit}
+.selector-btn:hover{border-color:rgba(196,164,112,0.25);background:rgba(196,164,112,0.04)}
+.selector-btn.active{background:linear-gradient(135deg,rgba(196,164,112,0.18),rgba(196,164,112,0.08));border:1.5px solid var(--border-active);transform:translateY(-1px);box-shadow:0 8px 30px rgba(196,164,112,0.12)}
+.selector-btn .btn-icon{font-size:20px;margin-bottom:5px}
+.selector-btn .btn-name{font-size:16px;font-weight:600;color:var(--text-dim);margin-bottom:3px;font-family:'DM Sans',sans-serif}
+.selector-btn.active .btn-name{color:var(--gold-light)}
+.selector-btn .btn-desc{font-size:12px;font-family:'DM Sans',sans-serif;color:rgba(196,164,112,0.4)}
+.var-field-group{margin:10px 0}
+.var-field-label{display:block;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--gold);margin-bottom:6px;text-transform:capitalize}
+.var-field-input{width:100%;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(196,164,112,0.2);border-radius:8px;color:var(--text-light);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .3s ease}
+.var-field-input::placeholder{color:rgba(196,164,112,0.3);font-style:italic}
+.var-field-input:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(196,164,112,0.15)}
+.combo-info{margin-top:16px;padding:12px 16px;background:rgba(196,164,112,0.06);border:1px solid rgba(196,164,112,0.12);border-radius:10px;font-size:12px;font-family:'DM Sans',sans-serif;color:rgba(196,164,112,0.5);line-height:1.6}
+.combo-info strong{color:rgba(196,164,112,0.7)}
+.editor-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.char-counter-wrap{display:flex;align-items:center;gap:10px}
+.char-bar{width:110px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.char-bar-fill{height:100%;border-radius:2px;transition:width .3s ease,background .3s ease}
+.char-bar-fill.normal{background:linear-gradient(90deg,var(--gold),#8b7355)}
+.char-bar-fill.warning{background:linear-gradient(90deg,var(--orange),#e67e22)}
+.char-bar-fill.danger{background:linear-gradient(90deg,var(--red),#c0392b)}
+.char-count{font-size:13px;font-family:'DM Mono','Courier New',monospace;color:rgba(196,164,112,0.6);min-width:85px;text-align:right}
+.char-count.warning{color:var(--orange)}
+.char-count.danger{color:var(--red);font-weight:700}
+#editor{width:100%;min-height:380px;padding:22px 24px;background:rgba(255,255,255,0.02);border:1px solid var(--border-faint);border-radius:14px;color:var(--text-light);font-size:14px;font-family:'DM Sans','Helvetica Neue',sans-serif;line-height:1.75;resize:vertical;outline:none;transition:border-color .3s ease}
+#editor:focus{border-color:rgba(196,164,112,0.4)}
+#editor.overlimit{border-color:rgba(231,76,60,0.5)}
+.overlimit-msg{margin-top:8px;padding:10px 14px;background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.25);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--red);display:none}
+.overlimit-msg.visible{display:block}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn-generate{flex:1 1 220px;padding:16px 24px;background:linear-gradient(135deg,#2d6a4f,#1b4332);border:1.5px solid rgba(45,106,79,0.6);border-radius:12px;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;color:#95d5b2;transition:all .3s ease;letter-spacing:.02em}
+.btn-generate:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(45,106,79,0.35);background:linear-gradient(135deg,#40916c,#2d6a4f)}
+.btn-copy{flex:1 1 200px;padding:15px 24px;background:linear-gradient(135deg,var(--gold),#8b7355);border:none;border-radius:12px;cursor:pointer;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--dark-bg);transition:all .3s ease;box-shadow:0 4px 20px rgba(196,164,112,0.25);letter-spacing:.02em}
+.btn-copy:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(196,164,112,0.35)}
+.btn-copy.copied{background:linear-gradient(135deg,var(--green),#1e8449)}
+.footer-guide{margin-top:44px;padding:18px 22px;background:rgba(196,164,112,0.04);border-radius:12px;border:1px solid rgba(196,164,112,0.08);font-size:12px;font-family:'DM Sans',sans-serif;color:rgba(196,164,112,0.4);line-height:1.7}
+.footer-guide strong{color:rgba(196,164,112,0.6)}
+.mb-32{margin-bottom:32px}
+.mb-24{margin-bottom:24px}
+@media(max-width:600px){header{padding:24px 16px 20px}main{padding:20px 16px 40px}.header-title{font-size:22px}.selector-btn{flex:1 1 100%}#editor{min-height:300px;padding:16px 18px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-icon">✦</div>
+    <div>
+      <h1 class="header-title">Générateur LinkedIn</h1>
+      <p class="header-sub">NB NEXT STEP — LAB Profile · Variations aléatoires</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="mb-32">
+    <span class="section-label">Métaprogramme cible</span>
+    <div class="selector-row mb-24" id="meta-selectors"></div>
+    <span class="section-label">Offre</span>
+    <div class="selector-row" id="offre-selectors"></div>
+  </section>
+
+  <!-- PERSONNALISATION -->
+  <section class="mb-32" id="var-section">
+    <span class="section-label">✏️ Personnaliser (optionnel)</span>
+    <div id="var-fields"></div>
+    <div class="combo-info" id="combo-info"></div>
+  </section>
+
+  <!-- EDITOR -->
+  <section>
+    <div class="editor-header">
+      <span class="section-label" style="margin-bottom:0">Éditeur de post</span>
+      <div class="char-counter-wrap">
+        <div class="char-bar"><div class="char-bar-fill normal" id="char-bar-fill"></div></div>
+        <span class="char-count" id="char-count">0 / 1400</span>
+      </div>
+    </div>
+    <textarea id="editor"></textarea>
+    <div class="overlimit-msg" id="overlimit-msg"></div>
+  </section>
+
+  <div class="actions">
+    <button class="btn-generate" id="btn-generate">🎲 Générer un nouveau post</button>
+    <button class="btn-copy" id="btn-copy">Copier le post</button>
+  </div>
+
+  <div class="footer-guide">
+    <strong>Guide LAB Profile</strong> — 
+    « S'éloigner de » : motive par les conséquences négatives et les risques. Mots clés : éviter, prévenir, avant qu'il ne soit trop tard.
+    « Référence interne » : valorise l'autonomie de décision. Mots clés : vous savez, votre choix, gardez le contrôle, à vous de juger.
+    <br><br><strong>Vocabulaire plaquette</strong> — surcharge cognitive · tensions invisibles · rythme décisionnel · réguler l'humain · cadre clair · régulation fine · continuité · Diagnostic NEXT STEP · décider avec clarté, avancer avec justesse.
+  </div>
+</main>
+
+<script>
+const MAX_CHARS = 1400;
+
+// ========================================
+// BLOCS ALÉATOIRES PAR COMBINAISON
+// Chaque combinaison a : hooks[], bodies[], ctas[], variables
+// Le générateur pioche 1 hook + 1 body + 1 cta au hasard
+// ========================================
+
+const BLOCKS = {
+  seloigner: {
+    codir: {
+      hooks: [
+        // CURIOSITÉ
+        "🧠 Votre CODIR est compétent. Vos décisions sont bien pensées.\nMais quelque chose ralentit l'exécution.",
+        "🔇 Votre CODIR se parle… mais ne se dit plus rien.",
+        "❓ Savez-vous combien coûte un CODIR qui dysfonctionne ?\nLa réponse va vous surprendre.",
+        "🔍 Il existe un problème que 80% des dirigeants voient\nmais que personne n'ose nommer.",
+        // CONTROVERSE
+        "⚡ 50% des échecs stratégiques naissent d'un CODIR divisé.\nPas d'un mauvais marché.",
+        "🚫 Le team building ne résout rien.\nVoilà, c'est dit.",
+        "💣 Votre prochain séminaire CODIR sera inutile.\nSauf si vous changez d'approche.",
+        "🤷 On dépense des fortunes en stratégie.\nMais on ne régule jamais l'humain qui l'exécute.",
+        // STORYTELLING
+        "🚪 Quand votre meilleur élément claque la porte, il est déjà trop tard.",
+        "💔 La confiance dans votre CODIR s'érode.\nEt personne n'en parle.",
+        "📉 Un CODIR que j'ai accompagné perdait 2 cadres dirigeants par an.\nLe problème n'était pas le salaire.",
+        "🔥 Votre CODIR gère des urgences. Mais qui gère le CODIR ?",
+        // AFFIRMATION AUDACIEUSE
+        "⚖️ Ce n'est pas plus de contrôle qu'il vous faut.\nC'est plus de justesse.",
+        "💡 Le vrai problème de votre CODIR n'est pas stratégique.\nIl est humain.",
+        "🚀 Vous êtes en hypercroissance.\nMais votre CODIR tient-il vraiment le rythme ?",
+        // QUESTION PROVOCANTE
+        "⏱️ Vos décisions arrivent trop vite. Ou trop tard.\nDans les deux cas, ça coûte cher.",
+        "😶 Non-dits, crispations, usure relationnelle.\nVotre CODIR fonctionne en mode survie.",
+        "🏋️ Combien de temps encore allez-vous porter seul\ndes décisions qui devraient être collectives ?"
+      ],
+      bodies: [
+        // PILIER 1 : Diagnostic du problème (éducatif)
+        "Ce « quelque chose », c'est rarement visible dans un reporting :\n\n⚡ Surcharge cognitive — décisions en cascade, perte de hiérarchie, informations non triées\n😶 Tensions invisibles — non-dits, crispations, usure relationnelle qui saturent les échanges\n⏱️ Rythme décisionnel déréglé — décisions trop rapides ou trop tardives, perte de timing\n\nLe dirigeant décide. L'équipe exécute.\nMais l'état interne n'est jamais adressé. 🔇\n\nRésultat : décisions plus rigides, relations plus tendues, signaux faibles ignorés.\n\nCe n'est pas un problème de stratégie.\nC'est un problème de rythme humain. 💡\n\nAvant d'optimiser un système, il faut réguler l'humain qui le pilote.",
+        // PILIER 2 : La méthode NEXT STEP (éducatif + promotionnel)
+        "Ce que j'observe dans les CODIR que j'accompagne :\n\nLes désaccords ne disparaissent pas.\n→ Ils deviennent plus utiles. ✅\n\nLa pression reste.\n→ Mais elle ne parasite plus la décision. 🎯\n\nComment ? En régulant l'humain là où les décisions se jouent :\n\n🔧 Un cadre clair — espaces définis, objectifs explicites, confidentialité absolue\n🔍 Une régulation fine — lecture des dynamiques, ajustement en temps réel, attention à ce qui ne se dit pas\n📅 De la continuité — avant les décisions clés, pendant les phases de tension, après pour stabiliser\n\nNB NEXT STEP n'intervient pas sur vos processus.\nNous régulons l'humain qui les pilote. 🧠",
+        // PILIER 3 : Le coût de l'inaction (émotionnel)
+        "Ce que personne ne mesure :\n\n💸 Coût d'un départ cadre dirigeant : 6 à 12 mois de salaire\n📉 Signal envoyé aux équipes : « ici, les signaux faibles sont ignorés »\n🔄 Effet domino : après un départ, d'autres suivent\n\nLe vrai problème ?\n\n🧠 Surcharge cognitive non régulée\n😶 Tensions invisibles jamais adressées\n⏱️ Rythme décisionnel qui épuise au lieu d'aligner\n\nAvant d'optimiser un système, il faut réguler l'humain qui le pilote. 💡\n\nNB NEXT STEP : sessions de régulation CODIR, suivi inter-sessions, restitution actionnable.",
+        // PILIER 4 : Les silos émotionnels (storytelling)
+        "Votre CODIR fonctionne en silos émotionnels :\n\n🏴 Chacun défend son périmètre au lieu du projet commun\n🤫 Les décisions sont prises puis sabotées en silence\n⚖️ Le DG arbitre au lieu de fédérer\n\nSans intervention, ce schéma se répète. Année après année. 🔁\n\nChez NB NEXT STEP, on régule l'humain là où les décisions se jouent.\n\n🔧 Cadre clair — espaces définis, objectifs explicites\n🔍 Régulation fine — lecture des dynamiques en temps réel\n📅 Continuité — avant, pendant et après les tensions\n\nQuand l'humain est régulé, les décisions deviennent plus claires. ✦",
+        // PILIER 5 : Contexte transformation (segment spécifique)
+        "En phase de transformation (levée, M&A, réorg, hypercroissance), les enjeux explosent :\n\n🧠 CODIR saturé — trop de décisions, pas assez de recul\n⚡ Décisions en cascade — plus personne ne sait qui arbitre quoi\n😶 Tensions nouvelles — des profils qui ne se connaissaient pas doivent décider ensemble\n\nLe réflexe classique : recruter, structurer, processer.\nMais personne ne régule l'humain qui pilote tout ça. 🔇\n\nNB NEXT STEP intervient avec un cadre clair et une régulation fine.\nDécider avec clarté. Avancer avec justesse. ✦",
+        // PILIER 6 : Les résultats concrets (preuve sociale)
+        "Ce que ça change concrètement quand l'humain est régulé :\n\n✅ Décisions prises avec moins de friction\n✅ Échanges plus fluides et directs\n✅ Moins de temps perdu à réparer après coup\n✅ Meilleure qualité de présence en réunion\n✅ Énergie dirigeante mieux utilisée\n\nLes désaccords ne disparaissent pas. Ils deviennent plus utiles. 🎯\nLa pression reste. Mais elle ne parasite plus la décision.\n\nCe n'est pas un problème de stratégie. C'est un problème de rythme humain.\nAvant d'optimiser un système, il faut réguler l'humain qui le pilote. 🧠",
+        // PILIER 7 : Pourquoi les approches classiques échouent (éducatif + controverse)
+        "Séminaire au vert, formation leadership, coaching individuel…\nVous avez déjà essayé. Et ça n'a pas tenu. 📉\n\nPourquoi ?\n\n❌ Le séminaire crée un élan — mais pas de cadre pour le maintenir\n❌ Le coaching individuel ignore la dynamique collective\n❌ La formation délivre des concepts — mais ne régule rien\n\nCe qui manque à ces approches :\n\n🔧 Un cadre clair qui structure les échanges dans la durée\n🔍 Une régulation fine qui lit ce qui ne se dit pas\n📅 De la continuité — pas un one-shot, un vrai accompagnement\n\nC'est exactement ce que fait NB NEXT STEP.\nRéguler l'humain là où les décisions se jouent. 🧠",
+        // PILIER 8 : Le dirigeant isolé (segment frustration)
+        "Le dirigeant porte tout :\n\n🏋️ Les arbitrages que personne ne veut assumer\n🔋 L'énergie relationnelle qui compense les failles du collectif\n🧠 La charge cognitive d'un CODIR qui dysfonctionne en silence\n\nRésultat ?\nDes décisions de plus en plus rigides.\nUne fatigue qui s'installe.\nDes signaux faibles ignorés parce qu'il n'y a plus de bande passante. 😶\n\nRéguler le CODIR, ce n'est pas un luxe.\nC'est ce qui permet au dirigeant de retrouver sa capacité de vision.\n\nNB NEXT STEP : cadre clair · régulation fine · continuité.\nQuand l'humain est régulé, les décisions deviennent plus claires. ✦"
+      ],
+      ctas: [
+        "🎯 Diagnostic NEXT STEP : ½ journée avec votre CODIR.\nRestitution structurée et actionnable.\n2 500€ HT · contact@nb-nextstep.fr",
+        "📞 On commence toujours par le Diagnostic NEXT STEP.\n½ journée · Lecture claire des zones de tension · Sans engagement.\ncontact@nb-nextstep.fr",
+        "💬 Curieux ? Le Diagnostic NEXT STEP pose les bases en ½ journée.\n2 500€ HT · contact@nb-nextstep.fr",
+        "⏰ Avant que ça ne s'aggrave, posons un diagnostic.\n½ journée · Restitution actionnable · 2 500€ HT\ncontact@nb-nextstep.fr",
+        "📅 Prochaine étape : le Diagnostic NEXT STEP.\nLa clarté précède toujours la décision.\ncontact@nb-nextstep.fr",
+        "🔧 Vous ne savez pas par où commencer ?\nLe Diagnostic NEXT STEP est fait pour ça.\n½ journée · Sans engagement · contact@nb-nextstep.fr",
+        "💡 Et si en ½ journée, vous aviez enfin une lecture claire\nde ce qui bloque votre CODIR ?\nDiagnostic NEXT STEP · contact@nb-nextstep.fr",
+        "🤝 Pas de programme standard chez NB NEXT STEP.\nOn commence par comprendre. Puis on régule.\ncontact@nb-nextstep.fr"
+      ],
+      variables: ["secteur"],
+      placeholders: {"secteur": "ex : tech, industrie, scale-up, post-levée, M&A…"}
+    },
+    cap_cohesion: {
+      hooks: [
+        // CURIOSITÉ
+        "😶 Vos agents ne démissionnent pas. Ils se désengagent. C'est pire.",
+        "📊 L'absentéisme grimpe. Les projets n'avancent pas.\nEt si le problème venait du sommet ?",
+        "❓ Pourquoi les meilleures collectivités perdent leurs meilleurs DGS ?\nLa réponse n'est jamais dans l'audit.",
+        // CONTROVERSE
+        "⚡ Quand l'élu et le DGS ne s'alignent pas, c'est toute la collectivité qui trinque.",
+        "🚫 Les diagnostics RPS ne changent rien.\nVoilà pourquoi.",
+        "🤷 On audite, on diagnostique, on recommande.\nMais on ne régule jamais l'humain qui décide.",
+        // STORYTELLING
+        "😓 Un DGS épuisé, des directeurs démotivés, des agents en retrait.\nVous reconnaissez le tableau ?",
+        "🔥 Burn-out au CODIR, conflit en conseil municipal, pétition d'agents.\nCes crises ne surgissent jamais de nulle part.",
+        "📉 Une collectivité que j'ai accompagnée perdait un directeur par an.\nLe problème n'était pas le recrutement.",
+        // AFFIRMATION AUDACIEUSE
+        "🔇 Dans votre collectivité, l'état interne de l'équipe de direction n'est jamais adressé.",
+        "🏛️ Le service public souffre.\nMais pas par manque de moyens — par manque de régulation au sommet.",
+        // QUESTION PROVOCANTE
+        "⏱️ Combien de temps encore votre DGS va-t-il tenir seul\nce que toute une équipe devrait porter ?",
+        "🧠 Votre équipe de direction gère des crises.\nMais qui gère l'équipe de direction ?"
+      ],
+      bodies: [
+        // Désengagement
+        "Dans les collectivités, on ne parle pas de « quiet quitting ».\nMais les symptômes sont là :\n\n📊 L'absentéisme grimpe sans explication médicale\n🐌 Les projets avancent au ralenti malgré les moyens\n😤 Les élus se plaignent, les DGS subissent, les agents encaissent\n\nLe problème n'est pas le manque de moyens.\nC'est que l'état interne de l'équipe de direction n'est jamais adressé. 🔇\n\nSurcharge cognitive, tensions invisibles, rythme décisionnel déréglé.\n\n✅ Cap Cohésion : 6 mois pour réguler l'humain qui pilote votre collectivité.\nCadre clair · Régulation fine · Continuité 🧠",
+        // Élu / DGS
+        "Personne n'en parle ouvertement. Mais tout le monde le sent :\n\n🎭 Les arbitrages changent selon l'humeur politique\n🧭 Les directeurs naviguent à vue entre deux autorités\n❓ Les agents perdent le sens de leur mission\n\nCe n'est pas un problème de compétence.\nC'est un problème de rythme humain. ⏱️\n\n🏛️ Cap Cohésion régule les dynamiques invisibles entre élus et administration.\n🔧 Cadre clair · Régulation fine · Continuité\n\nOn ne touche pas aux processus. On régule l'humain qui les pilote.\nQuand l'humain est régulé, les décisions deviennent plus claires. ✦",
+        // Crise annoncée
+        "Ces crises ne surgissent jamais de nulle part :\n\n🔥 Un burn-out en comité de direction\n💥 Un conflit ouvert en conseil municipal\n📝 Une pétition d'agents\n\nElles sont le résultat de mois de surcharge cognitive, de tensions invisibles et de rythme décisionnel déréglé. ⏳\n\n🛡️ Cap Cohésion intervient AVANT la crise.\nOn ne touche pas aux processus. On régule l'humain qui les pilote.\n\n✅ Atelier découverte de 3h\n✅ Programme en 3 phases sur 6 mois\n✅ Résultats mesurables\n✅ Méthodologie PNL adaptée au service public",
+        // Échec des audits
+        "Le problème des approches classiques en collectivité :\n\n❌ Les audits décrivent le problème sans donner les outils\n❌ Ils ignorent la surcharge cognitive et les tensions invisibles\n❌ Ils créent de la dépendance au consultant\n\n🏛️ Cap Cohésion est l'inverse d'un audit.\nC'est un programme de régulation. 💪\n\nEn 6 mois, on régule l'humain qui pilote votre collectivité.\nCadre clair · Régulation fine · Continuité 🧠\n\nAvant d'optimiser un système, il faut réguler l'humain qui le pilote. ✦",
+        // DGS isolé (nouveau segment)
+        "Le DGS porte tout :\n\n🏋️ L'interface permanente entre élus et administration\n🧠 La surcharge cognitive de décisions qui ne lui appartiennent pas toutes\n😔 L'isolement au sommet — personne pour réguler ce qu'il perçoit\n\nRésultat ?\nDes directions qui fonctionnent en silos.\nDes tensions qui s'installent.\nUn service public qui fonctionne malgré sa direction, pas grâce à elle. 😬\n\nCap Cohésion donne au DGS ce qui lui manque :\nUn cadre. Des outils. De la continuité.\nPour réguler l'humain au sommet de la collectivité. 🏛️",
+        // Résultats concrets (nouveau)
+        "Ce que ça change concrètement quand l'équipe de direction est régulée :\n\n✅ Les projets transversaux avancent sans avoir besoin d'être poussés\n✅ Les directeurs prennent des décisions sans remonter au DGS\n✅ Les tensions sont nommées et traitées, pas subies\n✅ Le service aux usagers s'améliore — naturellement\n\nCe n'est pas de la magie. C'est de la régulation.\nCadre clair · Régulation fine · Continuité 🔧\n\nQuand l'humain est régulé, le service public gagne en justesse. ✦"
+      ],
+      ctas: [
+        "💡 L'immobilisme coûte plus cher que le changement.\nParlons-en → lien en commentaire",
+        "🚨 Avant que la fracture ne devienne publique, agissons.\n→ lien en commentaire",
+        "📅 Ne laissez pas la crise décider du calendrier.\nCap Cohésion → lien en commentaire",
+        "🏛️ Cap Cohésion : 6 mois pour réguler l'humain qui pilote.\nAtelier découverte → lien en commentaire",
+        "🔧 Envie de comprendre comment ça fonctionne ?\nUn atelier découverte de 3h suffit pour poser les bases.\n→ lien en commentaire",
+        "📞 Échangeons 20 minutes.\nSans jargon, sans engagement.\n→ lien en commentaire"
+      ],
+      variables: ["collectivite"],
+      placeholders: {"collectivite": "ex : commune, intercommunalité, département…"}
+    }
+  },
+  ref_interne: {
+    codir: {
+      hooks: [
+        // CURIOSITÉ
+        "👁️ Vous le savez déjà : votre CODIR ne fonctionne pas à son plein potentiel.",
+        "📊 Et si vous pouviez piloter la santé humaine de votre CODIR en temps réel ?",
+        "❓ Pourquoi les dirigeants les plus lucides attendent-ils avant d'agir ?\nParce que personne ne leur propose le bon outil.",
+        // AFFIRMATION (autonomie)
+        "🎯 Vous sentez que quelque chose ne tourne pas rond dans votre CODIR.\nFaites-vous confiance.",
+        "⚔️ Transformer un CODIR, ça ne se délègue pas. Ça se décide.",
+        "💡 Votre instinct de dirigeant vous dit que quelque chose cloche.\nIl a raison.",
+        "⚖️ Ce n'est pas plus de contrôle. C'est plus de justesse.\nEt c'est vous qui en décidez.",
+        // CONTRÔLE / AUTONOMIE
+        "🔧 Vous n'avez pas besoin d'un énième consultant.\nVous avez besoin d'outils que vous maîtrisez.",
+        "🎯 Vous n'avez pas besoin qu'on vous dise quoi faire.\nVous avez besoin d'outils pour faire ce que vous savez déjà.",
+        "🔑 Les meilleurs dirigeants ne cherchent pas des réponses.\nIls cherchent les bons outils pour trouver les leurs.",
+        // STORYTELLING (décision)
+        "📉 Un dirigeant m'a dit : « Je sais exactement ce qui ne va pas.\nMais je n'ai pas les outils pour y remédier. »",
+        "🏋️ Vous portez seul des décisions qui devraient être collectives.\nCe n'est pas tenable. Et vous le savez."
+      ],
+      bodies: [
+        // Diagnostic lucide
+        "Vous n'avez pas besoin qu'on vous le dise. Vous le voyez :\n\n🧠 Surcharge cognitive — trop de décisions en cascade, plus de hiérarchie\n😶 Tensions invisibles — des non-dits qui saturent chaque échange\n⏱️ Rythme décisionnel déréglé — trop vite ou trop tard\n\nCe qu'il vous manque n'est pas un consultant de plus.\nC'est une régulation fine de l'humain qui pilote vos décisions. 🔧\n\nNB NEXT STEP : cadre clair, sessions de régulation CODIR, suivi en continu.\n🎯 Vous gardez le contrôle. Vous gagnez en justesse.\n\nDécider avec clarté. Avancer avec justesse. ✦",
+        // Instinct dirigeant
+        "Les chiffres sont bons. Officiellement, tout va bien. ✅\n\nMais votre instinct perçoit autre chose :\n\n🤐 Les vraies conversations n'ont pas lieu en réunion\n🎭 Certains membres jouent solo derrière un vernis collectif\n🔋 Vous compensez les failles relationnelles par votre propre énergie\n\nCe que vous percevez a un nom :\ntensions invisibles, surcharge cognitive, rythme décisionnel déréglé. 🔍\n\nMoi, je régule l'humain là où les décisions se jouent.\n🔧 Lecture des dynamiques · Ajustement en temps réel · Attention à ce qui ne se dit pas\n\n🔑 Pas de dépendance. Vous repartez avec des outils que vous maîtrisez.",
+        // Les formules (offre concrète)
+        "NB NEXT STEP propose deux formules ajustées à votre réalité :\n\n📋 Formule Essentielle — Régulation continue sur 3 mois\n· 6 sessions collectives de régulation CODIR (2h)\n· 3 sessions individuelles dirigeants (1h)\n· Plateforme de suivi NEXT STEP\n· Suivi inter-sessions + restitution mensuelle\n💰 15 000€ HT\n\n🔥 Formule Intensive — Accompagnement renforcé sur 6 mois\n· 12 sessions collectives + 6 individuelles\n· Accompagnement lors de 2 moments stratégiques\n· Suivi prioritaire + restitution bi-mensuelle\n💰 26 000€ HT\n\nPas de programme standard. Ajustement au rythme réel de votre organisation. ✦",
+        // Dashboard de suivi
+        "Chaque accompagnement NEXT STEP inclut un dashboard de suivi :\n\n🎯 Clarté décisionnelle — évolution de la qualité des décisions\n⚡ Tensions perçues — identification des zones de friction\n🧘 Qualité de présence — niveau d'engagement en réunion CODIR\n🚨 Signaux d'alerte — détection précoce des surcharges\n\nLa plupart des accompagnements se fient au ressenti du consultant.\nNous, on mesure. Vous voyez l'évolution. Vous décidez en connaissance de cause. 📈\n\nC'est votre tableau de bord. Pas celui du coach. Le vôtre. 🎯\n\nQuand l'humain est régulé, les décisions deviennent plus claires. ✦",
+        // Pourquoi les approches classiques échouent
+        "Vous avez probablement déjà essayé : séminaire, team building, coaching.\nRésultat : un effet soufflé qui retombe en 3 semaines. 📉\n\nPourquoi ? Parce que ces approches touchent la surface.\nPas le rythme humain qui conditionne chaque décision.\n\n🔧 NB NEXT STEP travaille en profondeur :\n· Cadre clair — espaces définis, objectifs explicites, confidentialité absolue\n· Régulation fine — lecture des dynamiques, ajustement en temps réel\n· Continuité — avant, pendant et après les phases de tension\n\nVous gardez le contrôle du processus. Vous gagnez en justesse. 🎯\nDécider avec clarté. Avancer avec justesse. ✦",
+        // Autonomie et maîtrise (nouveau — valorise la référence interne)
+        "Ce que NB NEXT STEP vous apporte, ce n'est pas une dépendance.\nC'est le contraire.\n\nÀ l'issue de l'accompagnement :\n\n🔑 Vous savez lire les dynamiques de votre CODIR\n🔧 Vous avez des outils concrets pour réguler les tensions\n📊 Vous disposez d'indicateurs pour piloter la santé humaine de votre équipe\n🎯 Vous êtes autonome\n\nNB NEXT STEP vous donne les clés.\nVous décidez quand et comment les utiliser.\n\nPas de contrat au long cours. Pas de dépendance au coach.\nJuste des outils qui vous rendent meilleur stratège. ✦",
+        // Vision vs arbitrage (nouveau — frustration segment dirigeant)
+        "Votre rôle, c'est la vision.\nPas l'arbitrage permanent. 🎯\n\nMais quand le CODIR dysfonctionne, le dirigeant devient pompier :\n\n🏋️ Il porte les décisions que le collectif devrait assumer\n🔋 Il compense par son énergie ce que la dynamique ne produit pas\n⏱️ Il perd son temps en régulation informelle au lieu de piloter\n\nRéguler le CODIR, c'est rendre au dirigeant sa capacité de vision.\n\n🔧 NB NEXT STEP : cadre clair · régulation fine · continuité\nVous reprenez la main. Pas sur les gens — sur la dynamique. ✦"
+      ],
+      ctas: [
+        "✊ Vous savez ce qu'il faut faire.\nDiagnostic NEXT STEP : ½ journée · 2 500€ HT\ncontact@nb-nextstep.fr",
+        "💡 Votre lucidité est votre meilleur atout.\nDiagnostic NEXT STEP → contact@nb-nextstep.fr",
+        "🤝 La décision vous appartient. Les outils sont prêts.\n½ journée · 2 500€ HT · contact@nb-nextstep.fr",
+        "🔧 Découvrez l'approche NEXT STEP.\nDiagnostic : ½ journée · Sans engagement\ncontact@nb-nextstep.fr",
+        "📅 Première étape : le Diagnostic NEXT STEP.\nLa clarté précède toujours la décision.\ncontact@nb-nextstep.fr"
+      ],
+      variables: ["contexte"],
+      placeholders: {"contexte": "ex : levée, réorg, hypercroissance, transformation…"}
+    },
+    cap_cohesion: {
+      hooks: [
+        // AUTONOMIE
+        "👁️ Vous n'avez pas besoin d'un audit pour savoir que votre équipe de direction dysfonctionne.",
+        "📋 Vous avez déjà fait des diagnostics RPS, des audits.\nEt après ?",
+        "🎯 Vous êtes DGS. Vous voyez tout. Mais personne ne régule ce que vous percevez.",
+        "🏛️ Votre collectivité a besoin de cohésion au sommet.\nPas d'un énième rapport.",
+        // CONTRÔLE / LUCIDITÉ
+        "🔑 Vous n'avez pas besoin qu'on vous explique le problème.\nVous avez besoin d'outils pour le résoudre.",
+        "⚔️ Reprendre la main sur la cohésion de votre équipe,\nça ne se sous-traite pas. Ça se décide.",
+        "💡 Vous connaissez votre collectivité mieux que n'importe quel consultant.\nCe qui vous manque, ce sont les outils.",
+        // FRUSTRATION
+        "😤 Les rapports s'empilent. Les recommandations restent lettre morte.\nVous le savez — c'est vous qui devez les mettre en œuvre.",
+        "📊 Des audits, vous en avez eu.\nDes résultats, jamais."
+      ],
+      bodies: [
+        // Silos et isolement
+        "Vous vivez cette réalité au quotidien :\n\n🏴 Des directeurs qui fonctionnent en silos\n🏋️ Des projets transversaux qui n'avancent que quand vous poussez\n😔 Un sentiment d'isolement à la tête de la machine\n\nVous avez la compétence technique.\nCe qui vous manque : des outils pour réguler la dynamique humaine. 🔧\n\n🏛️ Cap Cohésion :\n✅ Cadre clair — espaces définis, objectifs explicites, confidentialité absolue\n✅ Régulation fine — lecture des dynamiques, ajustement en temps réel\n✅ Continuité — avant, pendant et après les phases de tension\n\n🎯 Vous restez maître du calendrier.\nDécider avec clarté. Avancer avec justesse. ✦",
+        // Échec des audits
+        "Les rapports s'empilent. Les recommandations restent lettre morte. 😤\n\nLe problème des approches classiques :\n\n❌ Elles décrivent le problème sans donner les outils\n❌ Elles ignorent la surcharge cognitive et les tensions invisibles\n❌ Elles créent de la dépendance au consultant\n\n🏛️ Cap Cohésion est l'inverse d'un audit.\nC'est un programme de régulation. 💪\n\nEn 6 mois, on ne touche pas aux processus.\nOn régule l'humain qui les pilote. 🧠\n\n🎯 Vous jugez sur les résultats, pas sur les promesses.\nAvant d'optimiser un système, il faut réguler l'humain qui le pilote. ✦",
+        // Outils concrets
+        "Vous n'avez pas besoin qu'on vous explique le problème.\nVous avez besoin d'outils pour le résoudre. 🔧\n\nCap Cohésion vous donne ces outils :\n\n🔍 Lecture des dynamiques invisibles de votre équipe\n⚡ Régulation en temps réel des tensions\n📅 Accompagnement continu sur 6 mois\n📊 Résultats mesurables à chaque étape\n\nPas de jargon managérial importé du privé.\nDes protocoles adaptés aux réalités du service public. 🏛️\n\nVous restez décideur. Nous, on régule. ✦",
+        // Autonomie post-accompagnement (nouveau)
+        "Ce que Cap Cohésion vous apporte, ce n'est pas une béquille.\nC'est l'autonomie. 🔑\n\nÀ l'issue des 6 mois :\n\n✅ Votre équipe de direction sait nommer et traiter les tensions\n✅ Les dynamiques de groupe sont lisibles — par vous\n✅ Vous disposez d'outils de régulation que vous maîtrisez\n✅ Plus besoin de consultant permanent\n\nCap Cohésion transfère les compétences.\nVous repartez plus fort. Pas plus dépendant. 🏛️\n\nDécider avec clarté. Avancer avec justesse. ✦",
+        // Spécificité service public (nouveau)
+        "Ce qui rend la collectivité différente du privé :\n\n🏛️ Le temps politique n'est pas le temps managérial\n⚖️ Les décisions sont contraintes par le droit et l'intérêt général\n👥 Les agents ne sont pas des « collaborateurs » — ils sont fonctionnaires\n\nLes méthodes importées du privé ne fonctionnent pas ici.\nCap Cohésion a été conçu POUR le service public.\n\n🔧 Cadre adapté aux contraintes institutionnelles\n🔍 Régulation qui respecte les rôles élus / administration\n📅 Rythme ajusté au calendrier de la collectivité\n\nVous gardez la main. On régule. ✦"
+      ],
+      ctas: [
+        "💪 Vous connaissez votre collectivité mieux que personne. Avançons.\n→ lien en commentaire",
+        "✊ Assez de diagnostics. Place à la régulation.\nCap Cohésion → lien en commentaire",
+        "🏛️ Cap Cohésion : régulation sur 6 mois · Résultats mesurables\n→ lien en commentaire",
+        "🎯 Vous décidez. Nous régulons.\nCap Cohésion → lien en commentaire",
+        "🔑 Reprenez la main sur la dynamique de votre équipe.\nCap Cohésion → lien en commentaire",
+        "📞 20 minutes pour comprendre si Cap Cohésion\nest adapté à votre collectivité.\n→ lien en commentaire"
+      ],
+      variables: ["collectivite"],
+      placeholders: {"collectivite": "ex : commune, intercommunalité, département…"}
+    }
+  }
+};
+
+const META_OPTIONS = {
+  seloigner: { name: "S'éloigner de", icon: "🛡️", desc: "Motivé par les problèmes à éviter" },
+  ref_interne: { name: "Référence interne", icon: "🎯", desc: "Décide par soi-même, autonome" }
+};
+const OFFRE_OPTIONS = {
+  codir: { name: "CODIR", icon: "🏢", desc: "Entreprises & ETI" },
+  cap_cohesion: { name: "Cap Cohésion", icon: "🏛️", desc: "Collectivités territoriales" }
+};
+
+let currentMeta = "seloigner";
+let currentOffre = "codir";
+let varValues = {};
+let lastHook = -1, lastBody = -1, lastCta = -1;
+
+const editor = document.getElementById("editor");
+const charCount = document.getElementById("char-count");
+const charBarFill = document.getElementById("char-bar-fill");
+const overlimitMsg = document.getElementById("overlimit-msg");
+const comboInfo = document.getElementById("combo-info");
+
+function getBlocks() { return BLOCKS[currentMeta]?.[currentOffre]; }
+
+function randIndex(arr, lastIdx) {
+  if (arr.length <= 1) return 0;
+  let idx;
+  do { idx = Math.floor(Math.random() * arr.length); } while (idx === lastIdx);
+  return idx;
+}
+
+function countCombos(b) { return b.hooks.length * b.bodies.length * b.ctas.length; }
+
+function generatePost() {
+  const b = getBlocks();
+  if (!b) return;
+  lastHook = randIndex(b.hooks, lastHook);
+  lastBody = randIndex(b.bodies, lastBody);
+  lastCta = randIndex(b.ctas, lastCta);
+  let post = b.hooks[lastHook] + "\n\n" + b.bodies[lastBody] + "\n\n" + b.ctas[lastCta];
+  // Inject variables
+  Object.entries(varValues).forEach(([k, v]) => {
+    if (v.trim()) post = post.replace(new RegExp("\\{\\{" + k + "\\}\\}", "g"), v);
+  });
+  editor.value = post;
+  updateCharCounter();
+}
+
+function updateCharCounter() {
+  const len = editor.value.length;
+  const pct = Math.min((len / MAX_CHARS) * 100, 100);
+  charBarFill.style.width = pct + "%";
+  const over = len > MAX_CHARS, warn = len > MAX_CHARS * 0.9;
+  charBarFill.className = "char-bar-fill " + (over ? "danger" : warn ? "warning" : "normal");
+  charCount.className = "char-count " + (over ? "danger" : warn ? "warning" : "");
+  charCount.textContent = len + " / " + MAX_CHARS;
+  editor.classList.toggle("overlimit", over);
+  if (over) { overlimitMsg.textContent = "⚠️ Dépassement de " + (len - MAX_CHARS) + " caractères."; overlimitMsg.classList.add("visible"); }
+  else overlimitMsg.classList.remove("visible");
+}
+
+function renderSelectors(id, options, current, onSelect) {
+  const c = document.getElementById(id); c.innerHTML = "";
+  Object.entries(options).forEach(([k, v]) => {
+    const btn = document.createElement("button");
+    btn.className = "selector-btn" + (k === current ? " active" : "");
+    btn.innerHTML = '<div class="btn-icon">' + v.icon + '</div><div class="btn-name">' + v.name + '</div><div class="btn-desc">' + v.desc + '</div>';
+    btn.addEventListener("click", () => onSelect(k));
+    c.appendChild(btn);
+  });
+}
+
+function renderVarFields() {
+  const b = getBlocks(); if (!b) return;
+  const container = document.getElementById("var-fields");
+  container.innerHTML = "";
+  varValues = {};
+  b.variables.forEach(v => {
+    varValues[v] = "";
+    const ph = (b.placeholders && b.placeholders[v]) || "Tapez ici...";
+    const div = document.createElement("div"); div.className = "var-field-group";
+    div.innerHTML = '<label class="var-field-label">📝 ' + v + '</label><input type="text" class="var-field-input" data-var="' + v + '" placeholder="' + ph + '">';
+    container.appendChild(div);
+  });
+  container.querySelectorAll(".var-field-input").forEach(input => {
+    input.addEventListener("input", function() { varValues[this.dataset.var] = this.value; });
+  });
+  const combos = countCombos(b);
+  comboInfo.innerHTML = "<strong>🎲 " + combos + " combinaisons possibles</strong> — " + b.hooks.length + " hooks × " + b.bodies.length + " corps × " + b.ctas.length + " CTA. Chaque clic sur « Générer » crée un post unique.";
+}
+
+function selectMeta(k) {
+  currentMeta = k; lastHook = lastBody = lastCta = -1;
+  renderSelectors("meta-selectors", META_OPTIONS, currentMeta, selectMeta);
+  renderVarFields(); generatePost();
+}
+function selectOffre(k) {
+  currentOffre = k; lastHook = lastBody = lastCta = -1;
+  renderSelectors("offre-selectors", OFFRE_OPTIONS, currentOffre, selectOffre);
+  renderVarFields(); generatePost();
+}
+
+editor.addEventListener("input", updateCharCounter);
+
+document.getElementById("btn-generate").addEventListener("click", generatePost);
+
+document.getElementById("btn-copy").addEventListener("click", function() {
+  const btn = this;
+  navigator.clipboard.writeText(editor.value).then(() => {
+    btn.textContent = "✓ Copié !"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copier le post"; btn.classList.remove("copied"); }, 2000);
+  }).catch(() => {
+    editor.select(); document.execCommand("copy");
+    btn.textContent = "✓ Copié !"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copier le post"; btn.classList.remove("copied"); }, 2000);
+  });
+});
+
+// INIT
+renderSelectors("meta-selectors", META_OPTIONS, currentMeta, selectMeta);
+renderSelectors("offre-selectors", OFFRE_OPTIONS, currentOffre, selectOffre);
+renderVarFields();
+generatePost();
+</script>
+</body>
+</html>
